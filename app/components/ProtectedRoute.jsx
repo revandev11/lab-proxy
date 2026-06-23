@@ -14,34 +14,7 @@ export default function ProtectedRoute({
 
   // Re-verify token with backend when entering a protected route.
   // If the backend responds 401/invalid, force logout and redirect.
-  useEffect(() => {
-    if (loading) return;
-    if (!isAuthenticated) return;
-
-    let cancelled = false;
-    fetch("http://localhost:8080/api/me", { credentials: "include" })
-      .then((res) => {
-        if (!res.ok) throw new Error("unauthorized");
-        return res.json();
-      })
-      .then((data) => {
-        if (cancelled) return;
-        // If backend user differs from client user, treat as mismatch and logout
-        if (user && data && user.id && data.id && user.id !== data.id) {
-          logout();
-          router.push(redirectTo);
-        }
-      })
-      .catch(() => {
-        if (cancelled) return;
-        logout();
-        router.push(redirectTo);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [loading, isAuthenticated, user, logout, router, redirectTo]);
+  // Client-side re-validation moved to server proxy; no fetch here anymore.
 
   // Redirect unauthenticated users after loading completes
   useEffect(() => {
